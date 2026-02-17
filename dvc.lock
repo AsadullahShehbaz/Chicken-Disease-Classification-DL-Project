@@ -1,0 +1,117 @@
+schema: '2.0'
+stages:
+  data_ingestion:
+    cmd: python src/cnnClassifier/pipeline/stage_01_data_ingestion.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 0d318440bcf440e14153006fafad27c5
+      size: 871
+    - path: src/cnnClassifier/pipeline/stage_01_data_ingestion.py
+      hash: md5
+      md5: d2dc2450d7315e1ab4ae32927e80aaa8
+      size: 1089
+    outs:
+    - path: artifacts/data_ingestion/Chicken-Disease-Dataset
+      hash: md5
+      md5: 33c7b00e118c8e57db1d14f18106b6a4.dir
+      size: 29115923
+      nfiles: 800
+  prepare_base_model:
+    cmd: python src/cnnClassifier/pipeline/stage_02_prepare_base_model.py
+    deps:
+    - path: config/config.yaml
+      hash: md5
+      md5: 0d318440bcf440e14153006fafad27c5
+      size: 871
+    - path: src/cnnClassifier/pipeline/stage_02_prepare_base_model.py
+      hash: md5
+      md5: 21d24fb49d44c6bc2c54f90712aa8128
+      size: 910
+    params:
+      params.yaml:
+        CLASSES: 4
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+        INCLUDE_TOP: false
+        LEARNING_RATE: 0.01
+        WEIGHTS: imagenet
+    outs:
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: c1dd14c871cf191300c81ea8a359aeb1.dir
+      size: 118274004
+      nfiles: 2
+  training:
+    cmd: python src/cnnClassifier/pipeline/stage_03_training.py
+    deps:
+    - path: artifacts/data_ingestion/Chicken-Disease-Dataset
+      hash: md5
+      md5: 33c7b00e118c8e57db1d14f18106b6a4.dir
+      size: 29115923
+      nfiles: 800
+    - path: artifacts/prepare_base_model
+      hash: md5
+      md5: c1dd14c871cf191300c81ea8a359aeb1.dir
+      size: 118274004
+      nfiles: 2
+    - path: config/config.yaml
+      hash: md5
+      md5: 0d318440bcf440e14153006fafad27c5
+      size: 871
+    - path: src/cnnClassifier/components/prepare_callbacks.py
+      hash: md5
+      md5: 343af203b1de499049418bdc76cce193
+      size: 1092
+    - path: src/cnnClassifier/pipeline/stage_03_training.py
+      hash: md5
+      md5: b4a723c92a0e046e16bbcf7d9a65003e
+      size: 1151
+    params:
+      params.yaml:
+        AUGMENTATION: true
+        BATCH_SIZE: 16
+        EPOCHS: 1
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: f1ad4544aa0fb5161b0f419686988f04
+      size: 59342006
+  evaluation:
+    cmd: python src/cnnClassifier/pipeline/stage_04_evaluation.py
+    deps:
+    - path: artifacts/data_ingestion/Chicken-Disease-Dataset
+      hash: md5
+      md5: 33c7b00e118c8e57db1d14f18106b6a4.dir
+      size: 29115923
+      nfiles: 800
+    - path: artifacts/training/model.keras
+      hash: md5
+      md5: f1ad4544aa0fb5161b0f419686988f04
+      size: 59342006
+    - path: config/config.yaml
+      hash: md5
+      md5: 0d318440bcf440e14153006fafad27c5
+      size: 871
+    - path: src/cnnClassifier/pipeline/stage_04_evaluation.py
+      hash: md5
+      md5: ae8e63423ce1cd96001075abbc43f2b4
+      size: 798
+    params:
+      params.yaml:
+        BATCH_SIZE: 16
+        IMAGE_SIZE:
+        - 224
+        - 224
+        - 3
+    outs:
+    - path: scores.json
+      hash: md5
+      md5: feb60e8372b05120e5f81ae73d9f2a31
+      size: 72

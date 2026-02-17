@@ -7,3 +7,11 @@
 7.Update Pipeline 
 8.Update main.py
 9.Update dvc.yaml 
+
+`tensorboard --logdir artifacts/prepare-callbacks/tensorboard_log_dir/`
+
+`dvc init`
+
+`dvc repro`
+
+`dvc dag`

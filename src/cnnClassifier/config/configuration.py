@@ -1,6 +1,6 @@
 from cnnClassifier.constants import *
 from cnnClassifier.utils.common import read_yaml, create_directories
-from cnnClassifier.entity.config_entity import DataIngestionConfig ,PrepareBaseModelConfig,PrepareCallbacksConfig
+from cnnClassifier.entity.config_entity import DataIngestionConfig ,PrepareBaseModelConfig,PrepareCallbacksConfig,TrainingConfig,EvaluationConfig
 from pathlib import Path 
 import os 
 class ConfigurationManager:
@@ -56,4 +56,32 @@ class ConfigurationManager:
             root_dir=Path(config.root_dir),
             tensorboard_root_log_dir=Path(config.tensorboard_root_log_dir),
             checkpoint_model_filepath=Path(config.checkpoint_model_filepath)
+        )
+    def get_training_config(self) -> TrainingConfig:
+        training = self.config.training
+        prepare_base_model = self.config.prepare_base_model
+        params = self.params
+        training_data = os.path.join(self.config.data_ingestion.unzip_dir,"Chicken-Disease-Dataset")
+        create_directories([
+            Path(training.root_dir)
+        ])
+
+        return TrainingConfig(
+            root_dir = Path(training.root_dir),
+            trained_model_path = Path(training.trained_model_path) ,
+            updated_base_model_path = Path(prepare_base_model.updated_base_model_path),
+            training_data = Path(training_data) ,
+            params_epochs = params.EPOCHS,
+            params_batch_size = params.BATCH_SIZE,
+            params_is_augmentation = params.AUGMENTATION,
+            params_image_size = params.IMAGE_SIZE
+        )
+
+    def get_validation_config(self) -> EvaluationConfig:
+        return EvaluationConfig(
+            path_of_model=Path("artifacts/training/model.keras"),
+            training_data=Path("artifacts/data_ingestion/Chicken-Disease-Dataset"),
+            all_params=self.params,
+            params_image_size=self.params.IMAGE_SIZE,
+            params_batch_size=self.params.BATCH_SIZE
         )
