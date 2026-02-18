@@ -106,7 +106,7 @@ Chicken-Disease-Dataset
 .dvc/lock
 *.dvc.lock
 *.dvc.stage
- 
+ scores.json
 # ==================================================
 # MLflow
 # ==================================================
